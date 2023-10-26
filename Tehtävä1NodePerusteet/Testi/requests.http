@@ -13,3 +13,11 @@ GET http://127.0.0.1:3000/items/56
 ### POST /
 
 POST http://127.0.0.1:3000/items
+Content-Type: application/json
+
+{"name": "kurkku"}
+
+
+### POST /items error
+
+POST http://127.0.0.1:3000/items
