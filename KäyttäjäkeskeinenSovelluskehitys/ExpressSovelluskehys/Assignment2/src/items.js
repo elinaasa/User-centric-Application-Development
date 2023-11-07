@@ -73,5 +73,3 @@ const putItem = (req, res) => {
 };
 
 export { getItems, getItemsById, postItem, deleteItem, putItem };
-
-// TODO: add deleteItem(), putItem() and routing for those in index.js
