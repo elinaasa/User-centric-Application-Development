@@ -24,6 +24,30 @@ CREATE TABLE MediaItems (
   FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
+CREATE TABLE Comments (
+  comment_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  media_id INT NOT NULL,
+  user_id INT NOT NULL,
+  comment_text TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  FOREIGN KEY (media_id) REFERENCES MediaItems(media_id),
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Likes (
+  like_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  media_id INT NOT NULL,
+  user_id INT NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  FOREIGN KEY (media_id) REFERENCES MediaItems(media_id),
+  FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE UserLevels (
+  user_level_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  level_name VARCHAR(255) NOT NULL
+);
+
 INSERT INTO Users 
     VALUES (260, 'VCHar', 'secret123', 'vchar@example.com', 1, null);
 INSERT INTO Users 
@@ -36,3 +60,17 @@ INSERT INTO MediaItems (filename, filesize, title, description, user_id, media_t
          ('2f9b.jpg', 30635, 'Aksux and Jane', 'friends', 260, 'image/jpeg', null);
 
 
+INSERT INTO UserLevels (level_name) VALUES ('Admin'), ('Regular User'), ('Guest');
+-- Altering the Users table
+ALTER TABLE Users
+ADD FOREIGN KEY (user_level_id) REFERENCES UserLevels(user_level_id);
+
+SELECT * FROM MediaItems WHERE user_id = 305;
+
+UPDATE MediaItems SET title = 'New Title' WHERE media_id = 1;
+
+DELETE FROM Comments WHERE comment_id = 1;
+
+SELECT * FROM UserLevels;
+
+SELECT * FROM Users GROUP BY Users.user_level_id;
