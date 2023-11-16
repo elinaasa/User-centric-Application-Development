@@ -74,3 +74,4 @@ DELETE FROM Comments WHERE comment_id = 1;
 SELECT * FROM UserLevels;
 
 SELECT * FROM Users GROUP BY Users.user_level_id;
+
