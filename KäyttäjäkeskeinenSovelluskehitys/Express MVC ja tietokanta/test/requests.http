@@ -104,7 +104,7 @@ content-type: application/json
 {
   "username": "sfdsfadsf",
   "password": "ntyriggenskerral",
-  "email": "nexuuss@imaili"
+  "email": "nexuuss@imaili.fi"
 }
 
 ### Post users FAIL
@@ -148,8 +148,8 @@ POST http://localhost:3000/api/likes
 Content-Type: application/json
 
 {
-  "userId": 2,
-  "mediaId": 1
+  "user_id": 2,
+  "media_id": 1
 }
 
 ### removing a like
