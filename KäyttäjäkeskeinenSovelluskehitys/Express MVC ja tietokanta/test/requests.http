@@ -133,3 +133,24 @@ content-type: application/json
 
 ### Delete users
 DELETE http://localhost:3000/api/users/2
+
+
+### Get likes for media Item
+
+GET http://localhost:3000/api/likes/media/1
+
+
+### Get Likes for User
+GET http://localhost:3000/api/likes/user/2
+
+### adding a like
+POST http://localhost:3000/api/likes
+Content-Type: application/json
+
+{
+  "userId": 2,
+  "mediaId": 1
+}
+
+### removing a like
+DELETE http://localhost:3000/api/likes/1
