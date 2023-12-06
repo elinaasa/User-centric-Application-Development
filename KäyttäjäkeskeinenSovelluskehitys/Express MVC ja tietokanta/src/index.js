@@ -3,7 +3,9 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import mediaRouter from './routes/media-router.mjs';
 import userRouter from './routes/user-router.mjs';
-import {logger} from './middlewares/middlewares.mjs';
+import authRouter from './routes/auth-router.mjs';
+import likesRouter from './routes/likes-router.mjs';
+import {errorHandler, logger, notFoundHandler} from './middlewares/middlewares.mjs';
 
 const hostname = '127.0.0.1';
 const app = express();
@@ -29,11 +31,19 @@ app.get('/', (req, res) => {
   res.render('home', values);
 });
 
+// auth endpoints
+app.use('/api/auth', authRouter);
 // media endpoints
 app.use('/api/media', mediaRouter);
-
 // user endpoints
 app.use('/api/users', userRouter);
+// like endpoints
+app.use('/api/likes', likesRouter);
+
+// All others routes => 404
+app.use(notFoundHandler);
+// default error handler
+app.use(errorHandler);
 
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);

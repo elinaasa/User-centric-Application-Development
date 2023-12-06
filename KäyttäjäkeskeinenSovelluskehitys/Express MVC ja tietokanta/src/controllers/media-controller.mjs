@@ -1,8 +1,5 @@
-import {
-  addMedia,
-  fetchAllMedia,
-  fetchMediaById,
-} from "../models/media-model.mjs";
+import {validationResult} from "express-validator";
+import {addMedia, fetchAllMedia, fetchMediaById, updateMediaById, deleteMediaById} from "../models/media-model.mjs";
 
 const getMedia = async (req, res) => {
   const mediaItems = await fetchAllMedia();
@@ -11,8 +8,8 @@ const getMedia = async (req, res) => {
 
 const getMediaById = async (req, res) => {
   console.log(req.params);
-  const result = await fetchMediaById(req.params.id);
-  // "error handling" for different scenarios
+  const result = await fetchMediaById(req.params.id); 
+  // "error handling" for different scenarios 
   if (result) {
     if (result.error) {
       res.status(500);
@@ -20,47 +17,66 @@ const getMediaById = async (req, res) => {
     res.json(result);
   } else {
     res.status(404);
-    res.json({ error: "Not Found", media_id: req.params.id });
+    res.json({error: 'Not Found', media_id: req.params.id});
   }
 };
 
-const postMedia = async (req, res) => {
+const postMedia = async (req, res, next) => {
   //console.log('uploaded file', req.file);
   //console.log('uploaded form data', req.body);
-  const { title, description, user_id } = req.body;
-  const { filename, mimetype, size } = req.file;
-  if (filename && title && user_id) {
-    // TODO: add error handling when database error occurs
-    const newMedia = { title, description, user_id, filename, mimetype, size };
-    const result = await addMedia(newMedia);
-    res.status(201);
-    res.json({ message: "New media item added.", ...result });
-  } else {
-    res.sendStatus(400);
+  // Error handling moved to fileFilter
+  // if (!req.file) {
+  //   const error = new Error('file missing or invalid');
+  //   error.status = 400;
+  //   return next(error);
+  // }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    // details about errors:
+    console.log('validation errors', errors.array());
+    const error = new Error('invalid input fields');
+    error.status = 400;
+    return next(error);
   }
+  const {title, description} = req.body;
+  const {filename, mimetype, size} = req.file;
+  // req.user is added by authenticateToken middleware
+  const user_id = req.user.user_id;
+  const newMedia = {title, description, user_id, filename, mimetype, size};
+  const result = await addMedia(newMedia);
+  // error handling when database error occurs
+  if (result.error) {
+    return next(new Error(result.error));
+  }
+  res.status(201);
+  res.json({message: 'New media item added.', ...result});
 };
 
-const putMedia = (req, res) => {
-  res.sendStatus(200);
+const putMedia = async (req, res) => {
+  const updateFields = req.body;
+  const mediaId = req.params.id;
+
+  const result = await updateMediaById(mediaId, updateFields);
+
+  // error handling when database error occurs
+  if (result.error) {
+    return next(new Error(result.error));
+  }
+  res.status(200);
+  res.json({message: 'Updated media', ...result});
 };
 
 const deleteMedia = async (req, res) => {
-  try {
-    const { id } = req.params.id;
+  const mediaId = req.params.id;
 
-    const existingMedia = await fetchMediaById(id);
+  const result = await deleteMediaById(mediaId);
 
-    if (!existingMedia) {
-      res.sendStatus(404).json({ error: "Media item not found" });
-    }
-
-    const deletedMedia = await deleteMedia(id);
-
-    res.json({ message: "Media item deleted", deletedMedia });
-  } catch (e) {
-    console.error(e);
-    res.sendStatus(500);
+  // error handling when database error occurs
+  if (result.error) {
+    return next(new Error(result.error));
   }
+  res.status(200);
+  res.json({message: 'Deleted media', ...result});
 };
 
-export { getMedia, getMediaById, postMedia, putMedia, deleteMedia };
+export {getMedia, getMediaById, postMedia, putMedia, deleteMedia};
